@@ -1,6 +1,10 @@
 "use client"
 
-import { Briefcase } from "lucide-react"
+import { useEffect, useState } from "react"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { Briefcase, LogOut } from "lucide-react"
+import { useToast } from "@/hooks/use-toast"
 import type { PageType } from "@/app/page"
 
 interface HomePageProps {
@@ -8,15 +12,66 @@ interface HomePageProps {
 }
 
 export default function HomePage({ onNavigate }: HomePageProps) {
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [nickname, setNickname] = useState("")
+  const router = useRouter()
+  const { toast } = useToast()
+
+  useEffect(() => {
+    const token = localStorage.getItem("token")
+    const userStr = localStorage.getItem("user")
+    if (token && userStr) {
+      setIsLoggedIn(true)
+      try {
+        const user = JSON.parse(userStr)
+        setNickname(user.nickname || user.username || "用户")
+      } catch {
+        setNickname("用户")
+      }
+    }
+  }, [])
+
+  const handleLogout = () => {
+    localStorage.removeItem("token")
+    localStorage.removeItem("user")
+    setIsLoggedIn(false)
+    setNickname("")
+
+    toast({
+      variant: "success" as any,
+      title: "已退出登录",
+      description: "即将返回登录页...",
+    })
+
+    setTimeout(() => router.push("/login"), 800)
+  }
+
   return (
     <div className="h-screen flex flex-col bg-[#F5F7FA]">
       {/* 顶部品牌区 */}
       <header className="h-20 px-4 flex items-center justify-between bg-white">
         <div className="flex items-center gap-2">
-          <Briefcase className="w-6 h-6 text-[#4A90E2]" strokeWidth={1.5} />
-          <span className="text-xl font-semibold text-[#333333]">职路通</span>
+          <Link href="/" className="flex items-center gap-2">
+            <Briefcase className="w-6 h-6 text-brand-DEFAULT" strokeWidth={1.5} />
+            <span className="text-xl font-semibold text-slate-800">JobNavi</span>
+          </Link>
         </div>
-        <button className="text-[#4A90E2] text-sm font-medium">登录</button>
+        {isLoggedIn ? (
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-slate-600">Hi, {nickname}</span>
+            <button
+              onClick={handleLogout}
+              className="text-slate-400 hover:text-red-500 transition-colors"
+              title="退出登录"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
+          </div>
+        ) : (
+          <Link href="/login" className="text-brand-DEFAULT text-sm font-medium hover:underline">
+            登录
+          </Link>
+        )}
       </header>
 
       {/* 中部功能入口区 */}

@@ -1,4 +1,4 @@
-package org.joelife.backend;
+package org.jobnavi.backend;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

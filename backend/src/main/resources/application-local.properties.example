@@ -1,0 +1,9 @@
+# Copy this file to application-local.properties and fill in your credentials.
+# application-local.properties is gitignored and will NOT be committed.
+#
+# Rename:
+#   cp application-local.properties.example application-local.properties
+# Then edit application-local.properties and replace with your MySQL password.
+
+spring.datasource.username=your username
+spring.datasource.password=your password
