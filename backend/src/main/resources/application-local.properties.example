@@ -7,3 +7,11 @@
 
 spring.datasource.username=your username
 spring.datasource.password=your password
+
+# JWT secret (Base64, 32+ bytes for HS256)
+# Example (dev only): generate a random Base64 string and paste here.
+jobnavi.jwt.secret=REPLACE_ME_WITH_BASE64_SECRET_32BYTES_OR_LONGER
+
+# JWT expiration (ms)
+# 7 days = 604800000
+jobnavi.jwt.expiration-ms=604800000

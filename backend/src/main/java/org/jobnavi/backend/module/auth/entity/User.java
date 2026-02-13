@@ -22,6 +22,12 @@ public class User {
     @Column(unique = true)
     private String email;
 
+    @Column(name = "email_verified")
+    private Integer emailVerified = 0;
+
+    @Column(name = "email_verified_time")
+    private LocalDateTime emailVerifiedTime;
+
     private String avatar;
 
     private String mobile;
@@ -47,6 +53,10 @@ public class User {
     public void setNickname(String nickname) { this.nickname = nickname; }
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
+    public Integer getEmailVerified() { return emailVerified; }
+    public void setEmailVerified(Integer emailVerified) { this.emailVerified = emailVerified; }
+    public LocalDateTime getEmailVerifiedTime() { return emailVerifiedTime; }
+    public void setEmailVerifiedTime(LocalDateTime emailVerifiedTime) { this.emailVerifiedTime = emailVerifiedTime; }
     public String getAvatar() { return avatar; }
     public void setAvatar(String avatar) { this.avatar = avatar; }
     public String getMobile() { return mobile; }

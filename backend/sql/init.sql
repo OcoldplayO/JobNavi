@@ -33,6 +33,8 @@ CREATE TABLE `sys_user` (
   `password` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '加密密码',
   `nickname` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '昵称',
   `email` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '邮箱',
+  `email_verified` tinyint DEFAULT 0 COMMENT '邮箱是否已验证:0-否,1-是',
+  `email_verified_time` datetime DEFAULT NULL COMMENT '邮箱验证时间',
   `avatar` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '头像URL',
   `wx_openid` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '微信OpenID',
   `mobile` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '手机号',
@@ -44,6 +46,44 @@ CREATE TABLE `sys_user` (
   UNIQUE KEY `uk_username` (`username`),
   UNIQUE KEY `uk_email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户表(系统)';
+
+-- ----------------------------
+-- Table structure for sys_email_verification_code
+-- ----------------------------
+DROP TABLE IF EXISTS `sys_email_verification_code`;
+CREATE TABLE `sys_email_verification_code` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `email` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '邮箱',
+  `scene` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '场景:REGISTER,BIND_EMAIL,RESET_PASSWORD',
+  `code_hash` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '验证码Hash(SHA-256)',
+  `expire_time` datetime NOT NULL COMMENT '过期时间',
+  `used` tinyint DEFAULT 0 COMMENT '是否已使用:0-否,1-是',
+  `used_time` datetime DEFAULT NULL COMMENT '使用时间',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  KEY `idx_email_scene_used` (`email`,`scene`,`used`),
+  KEY `idx_expire_time` (`expire_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='邮箱验证码表(系统)';
+
+-- ----------------------------
+-- Table structure for sys_password_reset_token
+-- ----------------------------
+DROP TABLE IF EXISTS `sys_password_reset_token`;
+CREATE TABLE `sys_password_reset_token` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `user_id` bigint NOT NULL COMMENT '用户ID',
+  `email` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '邮箱(冗余便于排查)',
+  `token_hash` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '重置Token Hash(SHA-256)',
+  `expire_time` datetime NOT NULL COMMENT '过期时间',
+  `used` tinyint DEFAULT 0 COMMENT '是否已使用:0-否,1-是',
+  `used_time` datetime DEFAULT NULL COMMENT '使用时间',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  KEY `idx_user_used` (`user_id`,`used`),
+  KEY `idx_expire_time` (`expire_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='重置密码Token表(系统)';
 
 -- ----------------------------
 -- Table structure for biz_company_profile

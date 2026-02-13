@@ -122,10 +122,17 @@ export default function RegisterPage() {
       toast({
         variant: "success" as any,
         title: "注册成功",
-        description: "账号已创建，正在跳转登录...",
+        description: type === "username"
+          ? "账号已创建，请先完成邮箱验证"
+          : "账号已创建，正在跳转登录...",
       })
       
-      setTimeout(() => router.push("/login"), 800)
+      if (type === "username") {
+        setTimeout(() => router.push(`/verify-email?username=${encodeURIComponent(values.username)}`), 800)
+      } else {
+        // TODO: 邮箱注册也应走邮箱验证流程（MVP 暂不强制）
+        setTimeout(() => router.push("/login"), 800)
+      }
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -140,7 +147,7 @@ export default function RegisterPage() {
   const handleGoogleLogin = () => {
     toast({
       title: "Google 登录",
-      description: "正在连接 Google OAuth...",
+      description: "TODO：MVP 暂未接入 Google OAuth",
     })
   }
 

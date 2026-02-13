@@ -44,17 +44,25 @@ export default function ForgotPasswordPage() {
 
   async function onSubmit(values: z.infer<typeof forgotPasswordSchema>) {
     setIsLoading(true)
-    console.log("Reset password for:", values)
 
     try {
-      // TODO: Replace with actual API call
-      await new Promise((resolve) => setTimeout(resolve, 1500))
+      const res = await fetch("http://localhost:8080/api/v1/auth/password/reset/request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: values.email }),
+      })
+      const data = await res.json()
+      // 后端会“始终返回成功”以避免枚举用户；前端这里也按成功提示
+      if (!res.ok) {
+        console.warn("reset request non-200:", data)
+      }
       
       setIsSubmitted(true)
+      form.reset({ email: "" })
       toast({
-        title: "邮件已发送",
-        description: "请检查您的邮箱以重置密码。",
-        className: "bg-status-safe border-status-safe text-green-900",
+        variant: "success" as any,
+        title: "已提交请求",
+        description: "如果该邮箱存在账号，将收到重置链接（MVP：请查看后端控制台日志）",
       })
     } catch (error) {
       toast({
