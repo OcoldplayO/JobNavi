@@ -4,6 +4,8 @@ import org.jobnavi.backend.module.auth.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -12,4 +14,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
     boolean existsByUsername(String username);
     boolean existsByEmail(String email);
+
+    // Find users by status (e.g., 1 for deleted) and deleteTime older than the given timestamp
+    List<User> findByStatusAndDeleteTimeBefore(Integer status, LocalDateTime deleteTime);
 }
