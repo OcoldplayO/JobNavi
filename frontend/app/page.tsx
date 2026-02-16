@@ -1,37 +1,20 @@
 "use client"
 
-import { useState } from "react"
 import HomePage from "@/components/home-page"
-import JobListPage from "@/components/job-list-page"
-import InterviewListPage from "@/components/interview-list-page"
-import InterviewDetailPage from "@/components/interview-detail-page"
-
-export type PageType = "home" | "jobs" | "interviews" | "interview-detail"
+// Legacy state-based routing removed in favor of App Router
+// JobListPage -> /dashboard/jobs
+// InterviewListPage -> /dashboard/interviews
 
 export default function App() {
-  const [currentPage, setCurrentPage] = useState<PageType>("home")
-  const [selectedInterview, setSelectedInterview] = useState<number | null>(null)
-
-  const navigateTo = (page: PageType) => {
-    setCurrentPage(page)
-  }
-
-  const openInterviewDetail = (id: number) => {
-    setSelectedInterview(id)
-    setCurrentPage("interview-detail")
-  }
+  // onNavigate is no longer needed since HomePage uses router.push directly for new routes
+  // But we might need to keep the prop interface or update HomePage. 
+  // Let's check HomePage props again. It expects onNavigate.
+  // We should remove that prop from HomePage as well to be clean.
 
   return (
     <div className="min-h-screen bg-[#F5F7FA] flex justify-center">
       <div className="w-full max-w-[375px] min-h-screen bg-[#F5F7FA] relative shadow-xl">
-        {currentPage === "home" && <HomePage onNavigate={navigateTo} />}
-        {currentPage === "jobs" && <JobListPage onBack={() => navigateTo("home")} />}
-        {currentPage === "interviews" && (
-          <InterviewListPage onBack={() => navigateTo("home")} onSelectInterview={openInterviewDetail} />
-        )}
-        {currentPage === "interview-detail" && selectedInterview && (
-          <InterviewDetailPage interviewId={selectedInterview} onBack={() => navigateTo("interviews")} />
-        )}
+        <HomePage onNavigate={() => { }} />
       </div>
     </div>
   )

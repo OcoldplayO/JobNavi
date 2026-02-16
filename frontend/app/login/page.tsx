@@ -27,6 +27,8 @@ import {
 } from "@/components/ui/form"
 import { useToast } from "@/hooks/use-toast"
 
+import { useAuth } from "@/components/auth/auth-provider"
+
 const loginSchema = z.object({
   username: z.string().min(1, "请输入用户名"),
   password: z.string().min(6, "密码至少 6 位"),
@@ -37,14 +39,14 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const { toast } = useToast()
   const router = useRouter()
+  const { login, user } = useAuth()
 
   // If already logged in, redirect to homepage
   useEffect(() => {
-    const token = localStorage.getItem("token")
-    if (token) {
+    if (user) {
       router.replace("/")
     }
-  }, [router])
+  }, [user, router])
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -54,8 +56,7 @@ export default function LoginPage() {
     },
   })
 
-  // Clear form every time page mounts (e.g. redirected from register)
-  // NOTE: Chrome autofill may run AFTER first paint, so we clear twice.
+  // Clear form every time page mounts
   useEffect(() => {
     const clear = () => {
       setShowPassword(false)
@@ -91,14 +92,19 @@ export default function LoginPage() {
         throw new Error(data.msg || `登录失败 (${res.status})`)
       }
 
-      localStorage.setItem("token", data.data.token)
-      localStorage.setItem("user", JSON.stringify(data.data.user))
+      // Use AuthProvider login
+      login(data.data.token, data.data.user)
 
       // Clear form
       form.reset()
 
       toast({ variant: "success" as any, title: "登录成功", description: "正在跳转..." })
-      setTimeout(() => router.push("/"), 800)
+      // No manual timeout needed for router push, but keeping it for UX feel if desired? 
+      // Actually AuthProvider login sets state, Effect redirects. 
+      // But let's keep explicit push for clarity or just let the effect handle it?
+      // The Plan said "On success, call auth.login". The redirection might happen automatically if we have a guard on the page? 
+      // This is the login page, so we WANT to redirect AWAY.
+      setTimeout(() => router.push("/"), 500)
     } catch (error: any) {
       toast({
         variant: "destructive",
